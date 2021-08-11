@@ -23,33 +23,48 @@ export const ImportPlantsModalForm = ({
     open,
     onClose,
 }) => {
-    const [file, setFile] = useState(null);
     const [data, setData] = useState([]);
+    const [files, setFiles] = useState([]);
     const [uploading, setUploading] = useState(false);
-    const [hasError, setHasError] = useState(null);
+    const [hasErrors, setHasErrors] = useState([]);
     const [hasSucess, setHasSuccess] = useState(false);
 
     const {getRootProps, getInputProps} = useDropzone({
-        multiple: false,
+        multiple: true,
         accept: 'application/json',
-        onDrop: acceptedFiles => {
-            if(acceptedFiles.length) {
-                const fileReader = new FileReader();
-                fileReader.onload = e => {
-                  try {
-                    const result = JSON.parse(e.target.result);
-                    if(!Array.isArray(result)) {
-                        throw new Error('Data invalida')
-                    }
+        onDrop: newAcceptedFiles => {
+            if(newAcceptedFiles.length) {
+                const newData = []
+                const newFiles = []
+                const newErrors = [];
 
-                    setData(result);
-                    setFile(acceptedFiles[0]);
-                  } catch(err) {
-                    setHasError(err);
-                  }
-                };
-                fileReader.readAsText(acceptedFiles[0], "UTF-8");
-                
+                const loadFiles = (index = 0) => {
+                    const file = newAcceptedFiles[index];
+                    const fileReader = new FileReader();
+                    fileReader.onload = e => {
+                      try {
+                        const result = JSON.parse(e.target.result);
+                        if(!Array.isArray(result)) {
+                            throw new Error(`${file.name} Data invalida`)
+                        }
+
+                        newData.push(...result);
+                        newFiles.push(file);
+                      } catch(err) {
+                        newErrors.push(err)
+                      }
+
+                      if(index + 1 === newAcceptedFiles.length) {
+                        setData(newData);
+                        setFiles(newFiles);
+                        setHasErrors(newErrors);
+                      } else loadFiles(index + 1);
+
+                    };
+                    fileReader.readAsText(file, "UTF-8");
+
+                }
+                loadFiles();
             }
         }
     });
@@ -81,50 +96,57 @@ export const ImportPlantsModalForm = ({
             console.log(plants);
 
             setUploading(true);
-            setHasError(null)
+            setHasErrors([])
             setHasSuccess(false);
             Api.post('/plants', { plants })
                 .then(() => {
                     setHasSuccess(true);
-                    setFile(null);
                     setData([]);
                 })
-                .catch((err) => setHasError(err))
+                .catch((err) => setHasErrors([err]))
                 .finally(() => setUploading(false)) 
         }
-        
     };
 
     useEffect(() => {
         if(!open) {
-            setFile(null);
             setData([]);
-            setHasError(null)
+            setFiles([]);
+            setHasErrors([])
             setHasSuccess(false); 
         }
     }, [open]);
 
-    const fileComponent = file 
-        ? <p className="text-success">{file.name}</p>
-        : null;
+    const filesPreview = files.map((file, i) => (
+        <p key={`file-${i+1}`} className="text-success mt-2">{file.name}</p>
+    ))
 
-    let alertComponent = null;
-    if(hasError || hasSucess) {
-        const message = hasError?.message || 'Plantas Importadas Exitosamente!';
-        const variant = hasError ? 'danger' : 'success';
-        alertComponent = (
-            <Alert 
-                className="mt-3"
-                variant={variant} 
-                onClose={() => {
-                    setHasError(null);
-                    setHasSuccess(false);
-                }} 
-                dismissible>
-                {message}
-            </Alert>
-        )
-    }
+    const alertErrors = hasErrors.map((e, i) =>  (
+        <Alert   
+            key={`error-${i+1}`}
+            className="mt-3"
+            variant="danger" 
+            onClose={() => {
+                const auxErrors = [...hasErrors];
+                auxErrors.splice(i, 1);
+                setHasErrors(auxErrors)
+            }} 
+            dismissible>
+            {e.message}
+        </Alert>
+    ));
+
+    const alertSucess = hasSucess ? (
+        <Alert   
+            className="mt-3"
+            variant="success" 
+            onClose={() => {
+                setHasSuccess(false)
+            }} 
+            dismissible>
+            Plantas Importadas Exitosamente!
+        </Alert>
+    ) : null;
 
     return (
         <Modal centered show={open} backdrop="static">
@@ -136,9 +158,10 @@ export const ImportPlantsModalForm = ({
                     <div {...getRootProps({ style: drapzoneStyles })}>
                         <input {...getInputProps()} />
                         <p>Selecciona o Arrastra un Archivo JSON</p>
-                        {fileComponent}
+                        {filesPreview}
                     </div>
-                    {alertComponent}
+                    {alertErrors}
+                    {alertSucess}
                 </Modal.Body>
                 <Modal.Footer>
                   <Button 
