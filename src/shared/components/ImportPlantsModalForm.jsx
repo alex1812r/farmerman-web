@@ -102,6 +102,7 @@ export const ImportPlantsModalForm = ({
                 .then(() => {
                     setHasSuccess(true);
                     setData([]);
+                    setFiles([]);
                 })
                 .catch((err) => setHasErrors([err]))
                 .finally(() => setUploading(false)) 
