@@ -28,8 +28,11 @@ export const PlantsView = () => {
             to: timeToUtcNumber(filter.to)
         })}`
 		Api.get(url)
-			.then((res) => setPlants(res.data.plants))
-			.catch(err => setHasError(err))
+			.then((res) => setPlants(res.data.plants || []))
+			.catch(err => {
+                setHasError(err);
+                setPlants([]);
+            })
 			.finally(() => setIsLoading(false));
 	}, [filter]);
 
@@ -47,6 +50,9 @@ export const PlantsView = () => {
     const content = !isLoading 
         ? (
             <Row>
+                <Col xs={12} className="mb-3">
+                    Cantidad Encontrada: <b>{plants.length}</b>
+                </Col>
                 {plants.map(plant => 
                     <Col className="mb-4" xs={12} md={4} key={plant._id}>
                         <PlantCard data={plant} />

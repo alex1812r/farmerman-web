@@ -5,7 +5,7 @@ export function objectToUrlParams(data) {
     Object.keys(data)
         .forEach(k => {
             const v = data[k];
-            if(v) params.push(`${k}=${v}`)
+            if(v !== null && v !== undefined) params.push(`${k}=${v}`)
         });
     return params.join('&');
 }
@@ -18,4 +18,8 @@ export function timeToUtcNumber(time) {
         .join('')
     );
     return timeNumber;
+}
+
+export function truncateText(str, max) {
+    return str.substring(0, str.length - max) + '...';
 }

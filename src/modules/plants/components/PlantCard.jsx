@@ -1,12 +1,14 @@
 import React from 'react';
 import { Card, ListGroup, ListGroupItem, Row, Col } from 'react-bootstrap';
 import moment from 'moment';
+import { truncateText } from '../../../shared/utils';
+
+const FARM_URL = 'https://marketplace.plantvsundead.com/farm';
 
 export const PlantCard = ({ data }) => {
 	return (
 		<Card>
-
-			<Card.Body>
+		<Card.Body>
 				<img 
 					className="d-block m-auto mb-2"
 					width="100px" 
@@ -18,14 +20,14 @@ export const PlantCard = ({ data }) => {
 		  <ListGroup className="list-group-flush">
 		    <ListGroupItem>
 		    	<Row>
-		    		<Col>
+		    		<Col xs={5}>
 		    			ID: <b>
 				    	<span className="text-success">
 				    		{data.plantId}
 				    	</span>
 				    	</b>
 		    		</Col>
-		    		<Col className="text-end">
+		    		<Col xs={7} className="text-end">
 						Coordenadas: {' '}
 						<b>{data.land.x} , {data.land.y}</b>
 		    		</Col>
@@ -53,6 +55,16 @@ export const PlantCard = ({ data }) => {
 		    	</Row>
 		    	
 		    </ListGroupItem>
+            <ListGroupItem>
+                Granja:{' '} 
+                <a 
+                    className="text-primary" 
+                    href={`${FARM_URL}/${data.ownerId}`} 
+                    target="_blank"
+                    rel="noreferrer">
+                   <small><b>{truncateText(data.ownerId, 20)}</b></small>
+                </a>
+            </ListGroupItem>
 		  </ListGroup>
 		</Card>
 	)
