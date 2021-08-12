@@ -9,6 +9,14 @@ export const PlantCard = ({ data }) => {
 	return (
 		<Card>
 		<Card.Body>
+            <a
+                style={{ right: 0, top: 0 }}
+                className="btn btn-success position-absolute " 
+                href={`${FARM_URL}/${data._id}`} 
+                target="_blank"
+                rel="noreferrer">
+                Ir
+            </a>
 				<img 
 					className="d-block m-auto mb-2"
 					width="100px" 
@@ -64,6 +72,7 @@ export const PlantCard = ({ data }) => {
                     rel="noreferrer">
                    <small><b>{truncateText(data.ownerId, 20)}</b></small>
                 </a>
+                <br />
             </ListGroupItem>
 		  </ListGroup>
 		</Card>
