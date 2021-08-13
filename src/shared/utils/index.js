@@ -12,7 +12,7 @@ export function objectToUrlParams(data) {
 
 export function timeToUtcNumber(time) {
     const date = moment().format('YYYY-MM-DD');
-    const utcTime = moment(`${date}T${time}:00z`).utc().format('HH:mm:ss');
+    const utcTime = moment(`${date} ${time}`).utc().format('HH:mm:ss');
     const timeNumber = parseInt(utcTime
         .split(':')
         .join('')
