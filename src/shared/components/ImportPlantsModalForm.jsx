@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Alert } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Form, Modal, Button, Alert } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 import { Api } from '../services/api';
+import { createPlantData, validAndParsedDataJSON } from '../utils';
+import { NavTabsWithContent } from './NavTabsWithContent';
 
 const drapzoneStyles = {
     flex: '1',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     padding: '20px',
     borderWidth: '2px',
     borderRadius: '2px',
@@ -17,23 +20,39 @@ const drapzoneStyles = {
     color: '#bdbdbd',
     outline: 'none',
     transition: 'border .24s ease-in-out',
+    minHeight: 134
 };
 
 export const ImportPlantsModalForm = ({
     open,
     onClose,
 }) => {
+    const [activeTab, setActiveTab] = useState('json');
     const [data, setData] = useState([]);
     const [files, setFiles] = useState([]);
+    const [inputText, setInputText] = useState('');
     const [uploading, setUploading] = useState(false);
     const [hasErrors, setHasErrors] = useState([]);
     const [hasSucess, setHasSuccess] = useState(false);
+
+    const resetAlerts = useCallback(() => {
+        setHasErrors([])
+        setHasSuccess(false);
+    }, []);
+
+    const resetData = useCallback(() => {
+        setFiles([]);
+        setData([]);
+        setInputText('');
+    }, [])
 
     const {getRootProps, getInputProps} = useDropzone({
         multiple: true,
         accept: 'application/json',
         onDrop: newAcceptedFiles => {
             if(newAcceptedFiles.length) {
+                setHasSuccess(false);
+
                 const newData = []
                 const newFiles = []
                 const newErrors = [];
@@ -43,14 +62,11 @@ export const ImportPlantsModalForm = ({
                     const fileReader = new FileReader();
                     fileReader.onload = e => {
                       try {
-                        const result = JSON.parse(e.target.result);
-                        if(!Array.isArray(result)) {
-                            throw new Error(`${file.name} Data invalida`)
-                        }
-
+                        const result = validAndParsedDataJSON(e.target.result);
                         newData.push(...result);
                         newFiles.push(file);
                       } catch(err) {
+                        err.message = `${file.name} ${err.message}`;
                         newErrors.push(err)
                       }
 
@@ -72,51 +88,44 @@ export const ImportPlantsModalForm = ({
     const handleSubmit = (e) => {
         e.preventDefault();
         if(data.length) {
-            const plants = data.map((p) => {
-                return {
-                    _id: p._id,
-                    ownerId: p.ownerId,
-                    startTime: p.startTime, 
-                    plantId: p.plantId, 
-                    plantUnitId: p.plantUnitId, 
-                    plantElement: p.plantElement, 
-                    land: {
-                        landId: p.land.landId,
-                        x: p.land.x,
-                        y: p.land.y
-                    },
-                    plant: {
-                        iconUrl: p.plant.iconUrl
-                    },
-                    createdAt: p.createdAt,
-                    updatedAt: p.updatedAt,
-                }
-            });
+            const plants = data.map(createPlantData);
             
-            console.log(plants);
-
             setUploading(true);
-            setHasErrors([])
-            setHasSuccess(false);
+            resetAlerts()
             Api.post('/plants', { plants })
                 .then(() => {
                     setHasSuccess(true);
-                    setData([]);
-                    setFiles([]);
+                    resetData()
                 })
                 .catch((err) => setHasErrors([err]))
                 .finally(() => setUploading(false)) 
         }
     };
 
-    useEffect(() => {
-        if(!open) {
-            setData([]);
-            setFiles([]);
-            setHasErrors([])
-            setHasSuccess(false); 
+    const handleOnBlurInputText = () => {
+        if(Boolean(inputText)) {
+            try {
+                const result = validAndParsedDataJSON(inputText);
+                setData(result);
+            } catch(err) {
+                setHasErrors([err]);
+            }
         }
-    }, [open]);
+    }
+
+    const handleOnChangeTab = (v) => {
+        resetAlerts();
+        resetData();
+        setActiveTab(v)
+    };
+
+    useEffect(() => {
+        if(!open) {   
+            resetData();
+            resetAlerts() 
+        }
+    }, [open, resetData, resetAlerts]);
+
 
     const filesPreview = files.map((file, i) => (
         <p key={`file-${i+1}`} className="text-success mt-2">{file.name}</p>
@@ -149,6 +158,35 @@ export const ImportPlantsModalForm = ({
         </Alert>
     ) : null;
 
+    const navItems = [
+        {
+            key: 'json',
+            title: 'Archivo JSON',
+            content: (
+                <div {...getRootProps({ style: drapzoneStyles })}>
+                    <input {...getInputProps()} />
+                    <p>Selecciona o Arrastra un Archivo JSON</p>
+                    {filesPreview}
+                </div>
+            )
+        },
+        {
+            key: 'text',
+            title: 'Texto',
+            content: (
+                <Form.Control
+                    style={{ resize: 'none' }}
+                    placeholder="Inserta data copiada"
+                    as="textarea" 
+                    rows={5}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onBlur={handleOnBlurInputText}
+                />
+            )
+        }
+    ]
+
     return (
         <Modal centered show={open} backdrop="static">
             <form onSubmit={handleSubmit}>
@@ -156,11 +194,11 @@ export const ImportPlantsModalForm = ({
                   <Modal.Title>Importar Plantas</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div {...getRootProps({ style: drapzoneStyles })}>
-                        <input {...getInputProps()} />
-                        <p>Selecciona o Arrastra un Archivo JSON</p>
-                        {filesPreview}
-                    </div>
+                    <NavTabsWithContent 
+                        items={navItems}
+                        onChange={handleOnChangeTab}
+                        value={activeTab}
+                    />
                     {alertErrors}
                     {alertSucess}
                 </Modal.Body>

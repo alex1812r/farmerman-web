@@ -23,3 +23,32 @@ export function timeToUtcNumber(time) {
 export function truncateText(str, max) {
     return str.substring(0, str.length - max) + '...';
 }
+
+export function createPlantData(p) {
+    return {
+        _id: p._id,
+        ownerId: p.ownerId,
+        startTime: p.startTime, 
+        plantId: p.plantId, 
+        plantUnitId: p.plantUnitId, 
+        plantElement: p.plantElement, 
+        land: {
+            landId: p.land.landId,
+            x: p.land.x,
+            y: p.land.y
+        },
+        plant: {
+            iconUrl: p.plant.iconUrl
+        },
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+    };
+}
+
+export function validAndParsedDataJSON(data) {
+    const result = JSON.parse(data);
+    if(!Array.isArray(result)) {
+        throw new Error('Data invalida')
+    }
+    return result;
+}
