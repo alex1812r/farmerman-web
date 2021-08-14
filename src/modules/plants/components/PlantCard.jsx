@@ -12,7 +12,7 @@ export const PlantCard = ({ data }) => {
             <a
                 style={{ right: 0, top: 0 }}
                 className="btn btn-success position-absolute " 
-                href={`${FARM_URL}/${data._id}`} 
+                href={`${FARM_URL}/#/${data._id}`} 
                 target="_blank"
                 rel="noreferrer">
                 Ir
