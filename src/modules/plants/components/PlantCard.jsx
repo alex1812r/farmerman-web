@@ -67,7 +67,7 @@ export const PlantCard = ({ data }) => {
                 Granja:{' '} 
                 <a 
                     className="text-primary" 
-                    href={`${FARM_URL}/other/${data.ownerId}`} 
+                    href={`${FARM_URL}/other/#/${data.ownerId}`} 
                     target="_blank"
                     rel="noreferrer">
                    <small><b>{truncateText(data.ownerId, 20)}</b></small>
