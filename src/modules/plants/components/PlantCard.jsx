@@ -3,7 +3,7 @@ import { Card, ListGroup, ListGroupItem, Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { truncateText } from '../../../shared/utils';
 
-const PLANTS_VS_UNDEAD_URL = 'https://marketplace.plantvsundead.com/farm';
+const PLANTS_VS_UNDEAD_URL = 'https://marketplace.plantvsundead.com';
 
 export const PlantCard = ({ data }) => {
 	return (
