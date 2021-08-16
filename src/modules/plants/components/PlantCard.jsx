@@ -3,7 +3,7 @@ import { Card, ListGroup, ListGroupItem, Row, Col } from 'react-bootstrap';
 import moment from 'moment';
 import { truncateText } from '../../../shared/utils';
 
-const FARM_URL = 'https://marketplace.plantvsundead.com/farm';
+const PLANTS_VS_UNDEAD_URL = 'https://marketplace.plantvsundead.com';
 
 export const PlantCard = ({ data }) => {
 	return (
@@ -12,7 +12,7 @@ export const PlantCard = ({ data }) => {
             <a
                 style={{ right: 0, top: 0 }}
                 className="btn btn-success position-absolute " 
-                href={`${FARM_URL}/${data._id}`} 
+                href={`${PLANTS_VS_UNDEAD_URL}/#/farm/${data._id}`} 
                 target="_blank"
                 rel="noreferrer">
                 Ir
@@ -66,7 +66,7 @@ export const PlantCard = ({ data }) => {
                 Granja:{' '} 
                 <a 
                     className="text-primary" 
-                    href={`${FARM_URL}/other/${data.ownerId}`} 
+                    href={`${PLANTS_VS_UNDEAD_URL}/#/farm/other/${data.ownerId}`} 
                     target="_blank"
                     rel="noreferrer">
                    <small><b>{truncateText(data.ownerId, 20)}</b></small>
