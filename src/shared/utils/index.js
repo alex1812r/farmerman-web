@@ -45,10 +45,32 @@ export function createPlantData(p) {
     };
 }
 
+function validPlantData(item) {
+    return (
+      Boolean(item._id) 
+      && Boolean(item.ownerId)
+      && Boolean(item.plantId)
+      && Boolean(item.plantUnitId)
+      && Boolean(item.plantElement)
+      && Boolean(item.land)
+      && typeof item.land.x === 'number'
+      && typeof item.land.y === 'number'
+  );
+} 
+
 export function validAndParsedDataJSON(data) {
-    const result = JSON.parse(data);
-    if(!Array.isArray(result)) {
+    let result = JSON.parse(data);
+    if(
+        !Array.isArray(result) 
+        && typeof result !== "object"
+        && validPlantData(data)
+    ) {
         throw new Error('Data invalida')
+    }
+
+    if(!Array.isArray(result)) {
+        result = [result];
     }
     return result;
 }
+

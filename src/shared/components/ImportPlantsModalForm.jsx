@@ -126,6 +126,19 @@ export const ImportPlantsModalForm = ({
         }
     }, [open, resetData, resetAlerts]);
 
+    useEffect(() => {
+        if(activeTab === 'text') {
+            navigator.clipboard.readText()
+                .then((clipboard) => {
+                    const result = validAndParsedDataJSON(clipboard);
+                    setData(result);
+                    setInputText(JSON.stringify(result));
+                })
+                .catch((err) => console.log('error get clipboard data', err))
+        }   
+        
+    }, [activeTab])
+
 
     const filesPreview = files.map((file, i) => (
         <p key={`file-${i+1}`} className="text-success mt-2">{file.name}</p>

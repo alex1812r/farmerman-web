@@ -61,7 +61,6 @@ export const PlantCard = ({ data }) => {
 		    			 </b>
 		    		</Col>
 		    	</Row>
-		    	
 		    </ListGroupItem>
             <ListGroupItem>
                 Granja:{' '} 
