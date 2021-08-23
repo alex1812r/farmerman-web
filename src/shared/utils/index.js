@@ -40,6 +40,7 @@ export function createPlantData(p) {
         plant: {
             iconUrl: p.plant.iconUrl
         },
+        activeTools: p.activeTools,
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
     };
@@ -55,6 +56,8 @@ function validPlantData(item) {
       && Boolean(item.land)
       && typeof item.land.x === 'number'
       && typeof item.land.y === 'number'
+      && Array.isArray(item.activeTools)
+      && item.activeTools.find((tool) => tool.type === 'WATER')
   );
 } 
 

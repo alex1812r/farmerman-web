@@ -6,6 +6,7 @@ import { createPlantData, validAndParsedDataJSON } from '../utils';
 import { NavTabsWithContent } from './NavTabsWithContent';
 
 const drapzoneStyles = {
+    cursor: 'pointer',
     flex: '1',
     display: 'flex',
     flexDirection: 'column',

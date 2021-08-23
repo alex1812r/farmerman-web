@@ -8,7 +8,8 @@ export const Layout = ({ children }) => {
 
 	return (
 		<>
-    		<Navbar variant="dark" bg="dark" expand="lg">
+			<header>
+    		<Navbar variant="dark" bg="dark" expand="lg" fixed="top">
     			<Container>
     			    <Navbar.Brand>
     			    	<img src={logo} height="35px" width="70px" alt="logo" />
@@ -23,13 +24,17 @@ export const Layout = ({ children }) => {
                     </Navbar.Collapse>
     		    </ Container>
     		</Navbar>
-    		<Container className="mt-3">
-    			{children}
-    		</Container>
-            <ImportPlantsModalForm 
-                open={openImportModal}
-                onClose={() => setOpenImportModal(false)}
-            />
+			</header>
+				<main>
+					<div style={{ height: 62 }}></div>
+					<Container className="pt-4">
+						{children}
+					</Container>
+				</main>
+				<ImportPlantsModalForm 
+						open={openImportModal}
+						onClose={() => setOpenImportModal(false)}
+				/>
 		</>
 	);
 };
